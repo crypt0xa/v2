@@ -1,0 +1,14 @@
+{
+    "name": "Greed",
+    "description": "Sin of Greed Node",
+    "image": "ipfs://Qme8aMwfCLEuEqG91S3Ay5U32cNwTRJJGPd8e3fbYcTWWB/4.png",
+    "edition": 1,
+    "date": 1635791812957,
+    "attributes": [
+      {
+        "trait_type": "tier",
+        "value": "Greed"
+      }
+    ],
+    "compiler": "Sins Compiler"
+  }
