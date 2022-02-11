@@ -1,0 +1,14 @@
+{
+    "name": "Wrath",
+    "description": "Sin of Wrath Node",
+    "image": "ipfs://Qme8aMwfCLEuEqG91S3Ay5U32cNwTRJJGPd8e3fbYcTWWB/1.png",
+    "edition": 1,
+    "date": 1635791812957,
+    "attributes": [
+      {
+        "trait_type": "tier",
+        "value": "Wrath"
+      }
+    ],
+    "compiler": "Sins Compiler"
+  }
