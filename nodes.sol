@@ -1693,7 +1693,7 @@ contract SinsNode is ERC721Enumerable, Ownable, ControlledAccess{
         Sins = _sinsAddress;
         timeDeployed = block.timestamp;
         setBaseURI(_initBaseURI);
-        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x10ED43C718714eb63d5aA57B78B54704E256024E);
+        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
         uniswapV2Router = _uniswapV2Router;
         
 
