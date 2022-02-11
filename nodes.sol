@@ -1812,7 +1812,7 @@ contract SinsNode is ERC721Enumerable, Ownable, ControlledAccess{
         isPaused = _state;
     }
 
-    function swapTokensForEth(uint256 tokenAmount) public {
+    function swapTokensForEth(uint256 tokenAmount) private {
 
         // generate the uniswap pair path of token -> weth
         address[] memory path = new address[](2);
