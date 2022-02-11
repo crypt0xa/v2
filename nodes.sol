@@ -1781,7 +1781,7 @@ contract SinsNode is ERC721Enumerable, Ownable, ControlledAccess{
                 ? string(
                     abi.encodePacked(
                         currentBaseURI,
-                        nodeType[tokenId],
+                        nodeType[tokenId].toString(),
                         baseExtension
                     )
                 )
