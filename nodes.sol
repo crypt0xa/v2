@@ -1,18 +1,5 @@
 // SPDX-License-Identifier: MIT
 
-// Amended by HashLips
-/**
-    !Disclaimer!
-    These contracts have been used to create tutorials,
-    and was created for the purpose to teach people
-    how to create smart contracts on the blockchain.
-    please review this code on your own before using any of
-    the following code for production.
-    HashLips will not be liable in any way if for the use 
-    of the code. That being said, the code has been tested 
-    to the best of the developers' knowledge to work as intended.
-*/
-
 // File: @openzeppelin/contracts/utils/introspection/IERC165.sol
 pragma solidity ^0.8.0;
 
@@ -1706,11 +1693,16 @@ contract SinsNode is ERC721Enumerable, Ownable, ControlledAccess{
         Sins = _sinsAddress;
         timeDeployed = block.timestamp;
         setBaseURI(_initBaseURI);
-        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
+        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x10ED43C718714eb63d5aA57B78B54704E256024E);
         uniswapV2Router = _uniswapV2Router;
         
 
     }
+
+    receive() external payable {
+
+  	}
+
     function updateMintPrices(uint256[7] memory _prices) public onlyOwner{
         mintPrices = _prices;
     }
@@ -1820,11 +1812,11 @@ contract SinsNode is ERC721Enumerable, Ownable, ControlledAccess{
         isPaused = _state;
     }
 
-    function swapTokensForEth(uint256 tokenAmount) private {
+    function swapTokensForEth(uint256 tokenAmount) public {
 
         // generate the uniswap pair path of token -> weth
         address[] memory path = new address[](2);
-        path[0] = address(this);
+        path[0] = Sins;
         path[1] = uniswapV2Router.WETH();
 
         IERC20(Sins).approve(address(uniswapV2Router), tokenAmount);
