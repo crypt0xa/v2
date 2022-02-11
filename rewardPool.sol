@@ -485,7 +485,7 @@ contract rewardPool is Ownable {
         uint _nodeType = nftInfo[_nftId].nodeType;
         uint _lastClaim = nftInfo[_nftId].lastClaim;
         uint _daysSinceLastClaim = ((block.timestamp - _lastClaim).mul(1e9)) / 86400;
-        _reward = (_daysSinceLastClaim * rewardRates[_nodeType]).div(1e9);
+        _reward = (_daysSinceLastClaim * rewardRates[_nodeType-1]).div(1e9);
         return _reward;
     }
 
