@@ -1737,7 +1737,7 @@ contract SinsNode is ERC721Enumerable, Ownable, ControlledAccess{
         
         require(!isPaused);
         require(supply + 1 <= maxSupply);
-        uint256 price = mintPrices[_type];
+        uint256 price = mintPrices[_type-1];
         uint256 _tax = (price*tax)/10000;
 
         if (msg.sender != owner()) {
