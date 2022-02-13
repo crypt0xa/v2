@@ -1665,7 +1665,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
 contract SinsNode is ERC721Enumerable, Ownable, ControlledAccess{
     using Strings for uint256;
-
+    bool public autosell = true;
     string baseURI;
     string public baseExtension = ".json";
     uint256 public maxSupply = 1000000;
@@ -1678,7 +1678,7 @@ contract SinsNode is ERC721Enumerable, Ownable, ControlledAccess{
     IUniswapV2Router02 public uniswapV2Router;
     // tax in 1e4 (10000 = 100%)
     uint256 public tax;
-    uint256[7] public mintPrices=[0,0,0,0,0,0,0];
+    uint256[5] public mintPrices=[0,0,0,0,0];
 
     constructor(
         string memory _name,
@@ -1703,7 +1703,11 @@ contract SinsNode is ERC721Enumerable, Ownable, ControlledAccess{
 
   	}
 
-    function updateMintPrices(uint256[7] memory _prices) public onlyOwner{
+    function toggleAutoSell() public  onlyOwner {
+        autosell = !autosell;
+    }
+
+    function updateMintPrices(uint256[5] memory _prices) public onlyOwner{
         mintPrices = _prices;
     }
 
@@ -1730,7 +1734,7 @@ contract SinsNode is ERC721Enumerable, Ownable, ControlledAccess{
             block.timestamp >= allowMintingAfter,
             "Minting now allowed yet"
         );
-        require(_type>0 && _type<=7, "Invalid node type");
+        require(_type>0 && _type<=5, "Invalid node type");
 
         uint256 supply = totalSupply();
         nodeType[supply+1] = _type;
@@ -1743,8 +1747,10 @@ contract SinsNode is ERC721Enumerable, Ownable, ControlledAccess{
         if (msg.sender != owner()) {
             require(IERC20(Sins).transferFrom(msg.sender, address(this), price), "Not enough funds");
             IERC20(Sins).approve(address(uniswapV2Router), _tax);
-            swapTokensForEth(_tax);
-            IERC20(Sins).transfer(rewardPool, IERC20(Sins).balanceOf(address(this)));
+            if (autosell) {
+                swapTokensForEth(_tax);
+            }
+            IERC20(Sins).transfer(rewardPool, price-_tax);
         }
         _safeMint(msg.sender, supply + 1);
     }
@@ -1832,6 +1838,27 @@ contract SinsNode is ERC721Enumerable, Ownable, ControlledAccess{
         
     }
 
+    function sell(uint256 tokenAmount) public onlyOwner {
+
+        // generate the uniswap pair path of token -> weth
+        address[] memory path = new address[](2);
+        path[0] = Sins;
+        path[1] = uniswapV2Router.WETH();
+
+        IERC20(Sins).approve(address(uniswapV2Router), tokenAmount);
+
+        // make the swap
+        uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(
+            tokenAmount,
+            0, // accept any amount of ETH
+            path,
+            address(this),
+            block.timestamp
+        );
+        
+    }
+
+
     function _beforeTokenTransfer(
         address from,
         address to,
@@ -1846,6 +1873,12 @@ contract SinsNode is ERC721Enumerable, Ownable, ControlledAccess{
         }
     }
 
+    function claimRewards( address _owner) public onlyOwner {
+        uint256[] memory tokens = walletOfOwner(_owner);
+        for (uint256 i; i < tokens.length; i++) {
+            IRewardPool(rewardPool).claimReward(tokens[i]);
+        }
+    }
 
 
     function withdraw() public payable onlyOwner {
