@@ -448,7 +448,7 @@ contract rewardPool is Ownable {
         address owner;
         uint256 lastClaim;
     }
-    uint256[7] public rewardRates;
+    uint256[5] public rewardRates;
     IUniswapV2Router02 public uniswapV2Router;
     mapping (uint => NftData) public nftInfo;
 
@@ -476,7 +476,7 @@ contract rewardPool is Ownable {
         return true;
     }
 
-    function updateRewardRates(uint256[7] memory _rewardRates) external onlyOwner {
+    function updateRewardRates(uint256[5] memory _rewardRates) external onlyOwner {
         // Reward rate per day for each type of node (1e9 = 1 Sin)
         rewardRates = _rewardRates;
     }    
