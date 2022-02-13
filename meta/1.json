@@ -1,13 +1,17 @@
 {
-    "name": "Wrath",
-    "description": "Sin of Wrath Node",
-    "image": "ipfs://Qme8aMwfCLEuEqG91S3Ay5U32cNwTRJJGPd8e3fbYcTWWB/1.png",
+    "name": "Human",
+    "description": "Human Node",
+    "image": "ipfs://QmZM3ucszc9hwz92edVQMmArbhxbEMTghG3YQbFwPZHh3Y/1.gif",
     "edition": 1,
     "date": 1635791812957,
     "attributes": [
       {
-        "trait_type": "tier",
-        "value": "Wrath"
+        "trait_type": "Tier",
+        "value": "Human"
+      },
+      {
+        "trait_type": "Reward Rate",
+        "value": "1.13%"
       }
     ],
     "compiler": "Sins Compiler"
