@@ -1,14 +1,18 @@
 {
-    "name": "Envy",
-    "description": "Sin of Envy Node",
-    "image": "ipfs://Qme8aMwfCLEuEqG91S3Ay5U32cNwTRJJGPd8e3fbYcTWWB/2.png",
-    "edition": 1,
-    "date": 1635791812957,
-    "attributes": [
-      {
-        "trait_type": "tier",
-        "value": "Envy"
-      }
-    ],
-    "compiler": "Sins Compiler"
-  }
+  "name": "Giant",
+  "description": "Giant Node",
+  "image": "ipfs://QmZM3ucszc9hwz92edVQMmArbhxbEMTghG3YQbFwPZHh3Y/2.gif",
+  "edition": 1,
+  "date": 1635791812957,
+  "attributes": [
+    {
+      "trait_type": "Tier",
+      "value": "Giant"
+    },
+    {
+      "trait_type": "Reward Rate",
+      "value": "1.5%"
+    }
+  ],
+  "compiler": "Sins Compiler"
+}
