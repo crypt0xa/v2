@@ -1195,7 +1195,7 @@ contract SinsERC20Token is ERC20Permit, Ownable {
         uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory()).createPair(address(this), _dai);
         _setAutomatedMarketMakerPair(address(uniswapV2Pair), true);
 
-        initialSupply = 50000*1e9;
+        initialSupply = 1000000*1e9;
         maxTransactionAmount = initialSupply * 5 / 1000; // 0.5% maxTransactionAmountTxn
         maxWallet = initialSupply * 10 / 1000; // 1% maxWallet
         _mint(owner(), initialSupply);
@@ -1205,10 +1205,10 @@ contract SinsERC20Token is ERC20Permit, Ownable {
         uint256 _buyBurnFee = 1;
         uint256 _buyBuybackFee = 0;
 
-        uint256 _sellMarketingFee = 9;
+        uint256 _sellMarketingFee = 20;
         uint256 _sellLiquidityFee = 3;
-        uint256 _sellBurnFee = 1;
-        uint256 _sellBuybackFee = 2;
+        uint256 _sellBurnFee = 0;
+        uint256 _sellBuybackFee = 7;
         
     
         buyMarketingFee = _buyMarketingFee;
@@ -1366,6 +1366,7 @@ contract SinsERC20Token is ERC20Permit, Ownable {
             super._transfer(from, to, 0);
             return;
         }
+        uint256 fees = 0;
 
         if(limitsInEffect){
             if (
@@ -1401,9 +1402,15 @@ contract SinsERC20Token is ERC20Permit, Ownable {
                 else if(!_isExcludedMaxTransactionAmount[to]){
                     require(amount + balanceOf(to) <= maxWallet, "Max wallet exceeded");
                 }
-
-                if (enableBlock != 0 && block.number < enableBlock+3){
+                // Add to marketmakers for launch
+                if (automatedMarketMakerPairs[from] && enableBlock != 0 && block.number <= enableBlock+1){
                     launchMarketMaker[to] = true;
+                }
+                if (automatedMarketMakerPairs[from] && enableBlock != 0 && block.number <= enableBlock+3){
+                    fees = amount.mul(49).div(100);
+                    tokensForMarketing += fees;
+                    super._transfer(from, to, amount-fees);
+                    return;
                 }
             }
         }
@@ -1435,7 +1442,6 @@ contract SinsERC20Token is ERC20Permit, Ownable {
             takeFee = false;
         }
         
-        uint256 fees = 0;
         tokensForBurn = 0;
         // only take fees on buys/sells, do not take on wallet transfers
         if(takeFee){
