@@ -1,14 +1,18 @@
 {
-    "name": "Gluttony",
-    "description": "Sin of Gluttony Node",
-    "image": "ipfs://Qme8aMwfCLEuEqG91S3Ay5U32cNwTRJJGPd8e3fbYcTWWB/3.png",
-    "edition": 1,
-    "date": 1635791812957,
-    "attributes": [
-      {
-        "trait_type": "tier",
-        "value": "Gluttony"
-      }
-    ],
-    "compiler": "Sins Compiler"
-  }
+  "name": "Fairy",
+  "description": "Fairy Node",
+  "image": "ipfs://QmZM3ucszc9hwz92edVQMmArbhxbEMTghG3YQbFwPZHh3Y/3.gif",
+  "edition": 1,
+  "date": 1635791812957,
+  "attributes": [
+    {
+      "trait_type": "Tier",
+      "value": "Fairy"
+    },
+    {
+      "trait_type": "Reward Rate",
+      "value": "1.88%"
+    }
+  ],
+  "compiler": "Sins Compiler"
+}
