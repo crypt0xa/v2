@@ -1,13 +1,17 @@
 {
-    "name": "Lust",
-    "description": "Sin of Lust Node",
-    "image": "ipfs://Qme8aMwfCLEuEqG91S3Ay5U32cNwTRJJGPd8e3fbYcTWWB/5.png",
+    "name": "Demon",
+    "description": "Demon Node",
+    "image": "ipfs://QmZM3ucszc9hwz92edVQMmArbhxbEMTghG3YQbFwPZHh3Y/5.gif",
     "edition": 1,
     "date": 1635791812957,
     "attributes": [
       {
         "trait_type": "tier",
-        "value": "Lust"
+        "value": "Demon"
+      },
+      {
+        "trait_type": "Reward Rate",
+        "value": "3%"
       }
     ],
     "compiler": "Sins Compiler"
