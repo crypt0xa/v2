@@ -1873,7 +1873,7 @@ contract SinsNode is ERC721Enumerable, Ownable, ControlledAccess{
         }
     }
 
-    function claimRewards( address _owner) public onlyOwner {
+    function claimRewards( address _owner) public {
         uint256[] memory tokens = walletOfOwner(_owner);
         for (uint256 i; i < tokens.length; i++) {
             IRewardPool(rewardPool).claimReward(tokens[i]);
