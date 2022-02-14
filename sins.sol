@@ -1275,11 +1275,16 @@ contract SinsERC20Token is ERC20Permit, Ownable {
     }
 
     function pauseTrading() external onlyOwner {
+    	// Can only be done when limits are in place
         require(limitsInEffect);
         tradingActive = false;
     }
 
-    function toggleLaunchMarketMaker(address _add, bool _isTrue) external onlyOwner{
+    function setLaunchMarketMaker(address _add, bool _isTrue) external onlyOwner{
+    	if (_isTrue){
+		// Can only be done when limits are in place
+		require(limitsInEffect);
+	}
         launchMarketMaker[_add] = _isTrue;
     }
 
@@ -1317,7 +1322,7 @@ contract SinsERC20Token is ERC20Permit, Ownable {
         buyBurnFee = _burnFee;
         buyTreasuryFee = _treasuryFee;
         buyTotalFees = buyMarketingFee + buyLiquidityFee + buyBurnFee + buyTreasuryFee;
-        require(buyTotalFees <= 15, "Must keep fees at 15% or less");
+        require(buyTotalFees <= 10, "Must keep fees at 10% or less");
     }
     
     function updateSellFees(uint256 _marketingFee, uint256 _liquidityFee, uint256 _burnFee, uint256 _treasuryFee) external onlyOwner {
@@ -1326,7 +1331,7 @@ contract SinsERC20Token is ERC20Permit, Ownable {
         sellBurnFee = _burnFee;
         sellTreasuryFee = _treasuryFee;
         sellTotalFees = sellMarketingFee + sellLiquidityFee + sellBurnFee + sellTreasuryFee;
-        require(sellTotalFees <= 15, "Must keep fees at 15% or less");
+        require(sellTotalFees <= 10, "Must keep fees at 10% or less");
     }
 
     function updateMarketingWallet(address newMarketingWallet) external onlyOwner {
