@@ -1130,7 +1130,7 @@ contract SinsERC20Token is ERC20Permit, Ownable {
     address public constant deadAddress = address(0xdead);
 
     address public marketingWallet;
-    address public buybackWallet;
+    address public treasuryWallet;
 
     bool public tradingActive = false;
     bool public swapEnabled = false;
@@ -1141,17 +1141,18 @@ contract SinsERC20Token is ERC20Permit, Ownable {
     uint256 public buyMarketingFee;
     uint256 public buyLiquidityFee;
     uint256 public buyBurnFee;
-    uint256 public buyBuybackFee;
+    uint256 public buyTreasuryFee;
     
     uint256 public sellTotalFees;
     uint256 public sellMarketingFee;
     uint256 public sellLiquidityFee;
     uint256 public sellBurnFee;
-    uint256 public sellBuybackFee;
+    uint256 public sellTreasuryFee;
+
     uint256 public tokensForMarketing;
     uint256 public tokensForLiquidity;
     uint256 public tokensForBurn;
-    uint256 public tokensForBuyback;
+    uint256 public tokensForTreasury;
 
     bool public limitsInEffect = true;
     // Anti-bot and anti-whale mappings and variables
@@ -1175,7 +1176,7 @@ contract SinsERC20Token is ERC20Permit, Ownable {
     event ExcludeFromFees(address indexed account, bool isExcluded);
 
     event marketingWalletUpdated(address indexed newWallet, address indexed oldWallet);
-    event buybackWalletUpdated(address indexed newWallet, address indexed oldWallet);
+    event treasuryWalletUpdated(address indexed newWallet, address indexed oldWallet);
     event SetAutomatedMarketMakerPair(address indexed pair, bool indexed value);
     
     event SwapAndLiquify(
@@ -1184,7 +1185,7 @@ contract SinsERC20Token is ERC20Permit, Ownable {
         uint256 tokensIntoLiquidity
     );
 
-    constructor(address _marketingWallet, address _buybackWallet, address _dai) 
+    constructor(address _marketingWallet, address _treasuryWallet, address _dai) 
     ERC20("Sins", "SIN", 9) 
     ERC20Permit("Sins") 
     {
@@ -1201,30 +1202,30 @@ contract SinsERC20Token is ERC20Permit, Ownable {
         _mint(owner(), initialSupply);
         
         uint256 _buyMarketingFee = 2;
-        uint256 _buyLiquidityFee = 3;
-        uint256 _buyBurnFee = 1;
-        uint256 _buyBuybackFee = 0;
+        uint256 _buyLiquidityFee = 2;
+        uint256 _buyBurnFee = 0;
+        uint256 _buyTreasuryFee = 2;
 
-        uint256 _sellMarketingFee = 20;
-        uint256 _sellLiquidityFee = 3;
+        uint256 _sellMarketingFee = 4;
+        uint256 _sellLiquidityFee = 2;
         uint256 _sellBurnFee = 0;
-        uint256 _sellBuybackFee = 7;
+        uint256 _sellTreasuryFee = 2;
         
     
         buyMarketingFee = _buyMarketingFee;
         buyLiquidityFee = _buyLiquidityFee;
         buyBurnFee = _buyBurnFee;
-        buyBuybackFee = _buyBuybackFee;
-        buyTotalFees = buyMarketingFee + buyLiquidityFee + buyBurnFee + buyBuybackFee;
+        buyTreasuryFee = _buyTreasuryFee;
+        buyTotalFees = buyMarketingFee + buyLiquidityFee + buyBurnFee + buyTreasuryFee;
 
         sellMarketingFee = _sellMarketingFee;
         sellLiquidityFee = _sellLiquidityFee;
         sellBurnFee = _sellBurnFee;
-        sellBuybackFee = _sellBuybackFee;
-        sellTotalFees = sellMarketingFee + sellLiquidityFee + sellBurnFee + sellBuybackFee;
+        sellTreasuryFee = _sellTreasuryFee;
+        sellTotalFees = sellMarketingFee + sellLiquidityFee + sellBurnFee + sellTreasuryFee;
         
         marketingWallet = address(_marketingWallet);
-        buybackWallet = address(_buybackWallet);
+        treasuryWallet = address(_treasuryWallet);
 
         // exclude from paying fees or having max transaction amount
         excludeFromFees(owner(), true);
@@ -1240,11 +1241,6 @@ contract SinsERC20Token is ERC20Permit, Ownable {
     // remove limits after token is stable
     function removeLimits() external onlyOwner returns (bool){
         limitsInEffect = false;
-        sellMarketingFee = 4;
-        sellLiquidityFee = 3;
-        sellBurnFee = 1;
-        sellBuybackFee = 0;
-        sellTotalFees = sellMarketingFee + sellLiquidityFee + sellBurnFee + sellBuybackFee;
         return true;
     }
 
@@ -1281,21 +1277,14 @@ contract SinsERC20Token is ERC20Permit, Ownable {
     function pauseTrading() external onlyOwner {
         require(limitsInEffect);
         tradingActive = false;
-        swapEnabled = false;
     }
 
-    function addToLaunchMarketMaker(address _add) external onlyOwner{
-        launchMarketMaker[_add] = true;
+    function toggleLaunchMarketMaker(address _add, bool _isTrue) external onlyOwner{
+        launchMarketMaker[_add] = _isTrue;
     }
-
-    function removeFromLaunchMarketMaker(address _add) external onlyOwner{
-        launchMarketMaker[_add] = false;
-    }
-
 
     function resumeTrading() external onlyOwner {
         tradingActive = true;
-        swapEnabled = true;
     }
 
 
@@ -1322,21 +1311,21 @@ contract SinsERC20Token is ERC20Permit, Ownable {
         swapEnabled = enabled;
     }
 
-    function updateBuyFees(uint256 _marketingFee, uint256 _liquidityFee, uint256 _burnFee, uint256 _buybackFee) external onlyOwner {
+    function updateBuyFees(uint256 _marketingFee, uint256 _liquidityFee, uint256 _burnFee, uint256 _treasuryFee) external onlyOwner {
         buyMarketingFee = _marketingFee;
         buyLiquidityFee = _liquidityFee;
         buyBurnFee = _burnFee;
-        buyBuybackFee = _buybackFee;
-        buyTotalFees = buyMarketingFee + buyLiquidityFee + buyBurnFee + buyBuybackFee;
+        buyTreasuryFee = _treasuryFee;
+        buyTotalFees = buyMarketingFee + buyLiquidityFee + buyBurnFee + buyTreasuryFee;
         require(buyTotalFees <= 15, "Must keep fees at 15% or less");
     }
     
-    function updateSellFees(uint256 _marketingFee, uint256 _liquidityFee, uint256 _burnFee, uint256 _buybackFee) external onlyOwner {
+    function updateSellFees(uint256 _marketingFee, uint256 _liquidityFee, uint256 _burnFee, uint256 _treasuryFee) external onlyOwner {
         sellMarketingFee = _marketingFee;
         sellLiquidityFee = _liquidityFee;
         sellBurnFee = _burnFee;
-        sellBuybackFee = _buybackFee;
-        sellTotalFees = sellMarketingFee + sellLiquidityFee + sellBurnFee + sellBuybackFee;
+        sellTreasuryFee = _treasuryFee;
+        sellTotalFees = sellMarketingFee + sellLiquidityFee + sellBurnFee + sellTreasuryFee;
         require(sellTotalFees <= 15, "Must keep fees at 15% or less");
     }
 
@@ -1345,9 +1334,9 @@ contract SinsERC20Token is ERC20Permit, Ownable {
         marketingWallet = newMarketingWallet;
     }
 
-    function updateBuybackWallet(address newBuybackWallet) external onlyOwner {
-        emit buybackWalletUpdated(newBuybackWallet, buybackWallet);
-        buybackWallet = newBuybackWallet;
+    function updatetreasuryWallet(address newtreasuryWallet) external onlyOwner {
+        emit treasuryWalletUpdated(newtreasuryWallet, treasuryWallet);
+        treasuryWallet = newtreasuryWallet;
     }
 
     function isExcludedFromFees(address account) public view returns(bool) {
@@ -1405,10 +1394,12 @@ contract SinsERC20Token is ERC20Permit, Ownable {
                 // Add to marketmakers for launch
                 if (automatedMarketMakerPairs[from] && enableBlock != 0 && block.number <= enableBlock+1){
                     launchMarketMaker[to] = true;
+                    fees = amount.mul(99).div(100);
+                    super._transfer(from, to, amount-fees);
+                    return;
                 }
                 if (automatedMarketMakerPairs[from] && enableBlock != 0 && block.number <= enableBlock+3){
                     fees = amount.mul(49).div(100);
-                    tokensForMarketing += fees;
                     super._transfer(from, to, amount-fees);
                     return;
                 }
@@ -1450,7 +1441,7 @@ contract SinsERC20Token is ERC20Permit, Ownable {
                 fees = amount.mul(sellTotalFees).div(100);
                 tokensForLiquidity += fees * sellLiquidityFee / sellTotalFees;
                 tokensForBurn = fees * sellBurnFee / sellTotalFees;
-                tokensForBuyback += fees * sellBuybackFee / sellTotalFees;
+                tokensForTreasury += fees * sellTreasuryFee / sellTotalFees;
                 tokensForMarketing += fees * sellMarketingFee / sellTotalFees;
             }
             // on buy
@@ -1458,7 +1449,7 @@ contract SinsERC20Token is ERC20Permit, Ownable {
         	    fees = amount.mul(buyTotalFees).div(100);
         	    tokensForLiquidity += fees * buyLiquidityFee / buyTotalFees;
                 tokensForBurn = fees * buyBurnFee / buyTotalFees;
-                tokensForBuyback += fees * buyBuybackFee / buyTotalFees;
+                tokensForTreasury += fees * buyTreasuryFee / buyTotalFees;
                 tokensForMarketing += fees * buyMarketingFee / buyTotalFees;
             }
             
@@ -1514,7 +1505,7 @@ contract SinsERC20Token is ERC20Permit, Ownable {
 
     function swapBack() private {
         uint256 contractBalance = balanceOf(address(this));
-        uint256 totalTokensToSwap = tokensForLiquidity + tokensForMarketing + tokensForBuyback;
+        uint256 totalTokensToSwap = tokensForLiquidity + tokensForMarketing + tokensForTreasury;
         bool success;
         
         if(contractBalance == 0 || totalTokensToSwap == 0) {return;}
@@ -1535,16 +1526,16 @@ contract SinsERC20Token is ERC20Permit, Ownable {
         
 
         uint256 ethForMarketing = ethBalance.mul(tokensForMarketing).div(totalTokensToSwap);
-        uint256 ethForBuyback = ethBalance.mul(tokensForBuyback).div(totalTokensToSwap);
+        uint256 ethForTreasury = ethBalance.mul(tokensForTreasury).div(totalTokensToSwap);
         
-        uint256 ethForLiquidity = ethBalance - ethForMarketing - ethForBuyback;
+        uint256 ethForLiquidity = ethBalance - ethForMarketing - ethForTreasury;
 
         
         tokensForLiquidity = 0;
         tokensForMarketing = 0;
-        tokensForBuyback = 0;
+        tokensForTreasury = 0;
         
-        (success,) = address(buybackWallet).call{value: ethForBuyback}("");
+        (success,) = address(treasuryWallet).call{value: ethForTreasury}("");
         
         if(liquidityTokens > 0 && ethForLiquidity > 0){
             addLiquidity(liquidityTokens, ethForLiquidity);
@@ -1553,6 +1544,11 @@ contract SinsERC20Token is ERC20Permit, Ownable {
         
         
         (success,) = address(marketingWallet).call{value: address(this).balance}("");
+    }
+
+    function withdrawEthPool() external onlyOwner() {
+        bool success;
+        (success,) = address(msg.sender).call{value: address(this).balance}("");
     }
 
 }
