@@ -451,6 +451,7 @@ contract rewardPool is Ownable {
     uint256[5] public rewardRates;
     IUniswapV2Router02 public uniswapV2Router;
     mapping (uint => NftData) public nftInfo;
+    uint totalNodes = 0;
 
     constructor(address _sinAddress) {     
         IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
@@ -467,6 +468,7 @@ contract rewardPool is Ownable {
         nftInfo[_nftId].nodeType = _nodeType;
         nftInfo[_nftId].owner = _owner;
         nftInfo[_nftId].lastClaim = block.timestamp;
+        totalNodes += 1;
         return true;
     }
 
@@ -478,6 +480,9 @@ contract rewardPool is Ownable {
 
     function updateRewardRates(uint256[5] memory _rewardRates) external onlyOwner {
         // Reward rate per day for each type of node (1e9 = 1 Sin)
+        for (uint i = 1; i < totalNodes; i++) {
+            claimReward(i);
+        }
         rewardRates = _rewardRates;
     }    
 
@@ -489,7 +494,7 @@ contract rewardPool is Ownable {
         return _reward;
     }
 
-    function claimReward(uint _nftId) external returns (bool success) {
+    function claimReward(uint _nftId) public returns (bool success) {
         uint _reward = pendingRewardFor(_nftId);
         nftInfo[_nftId].lastClaim = block.timestamp;
         IERC20(Sins).transfer(nftInfo[_nftId].owner, _reward);
