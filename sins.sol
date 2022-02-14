@@ -1165,7 +1165,6 @@ contract SinsERC20Token is ERC20Permit, Ownable {
     uint256 public maxTransactionAmount;
     uint256 public maxWallet;
     uint256 public initialSupply;
-    address public dai;
     // store addresses that a automatic market maker pairs. Any transfer *to* these addresses
     // could be subject to a maximum transfer amount
     mapping (address => bool) public automatedMarketMakerPairs;
@@ -1185,15 +1184,14 @@ contract SinsERC20Token is ERC20Permit, Ownable {
         uint256 tokensIntoLiquidity
     );
 
-    constructor(address _marketingWallet, address _treasuryWallet, address _dai) 
+    constructor(address _marketingWallet, address _treasuryWallet) 
     ERC20("Sins", "SIN", 9) 
     ERC20Permit("Sins") 
     {
 
         IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
         uniswapV2Router = _uniswapV2Router;
-        dai = _dai;
-        uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory()).createPair(address(this), _dai);
+        uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory()).createPair(address(this), uniswapV2Router.WETH());
         _setAutomatedMarketMakerPair(address(uniswapV2Pair), true);
 
         initialSupply = 1000000*1e9;
@@ -1269,6 +1267,7 @@ contract SinsERC20Token is ERC20Permit, Ownable {
 
     // once enabled, can never be turned off
     function enableTrading() external onlyOwner {
+        require(!tradingActive);
         tradingActive = true;
         swapEnabled = true;
         enableBlock = block.number;
@@ -1276,7 +1275,6 @@ contract SinsERC20Token is ERC20Permit, Ownable {
 
     function pauseTrading() external onlyOwner {
     	// Can only be done when limits are in place
-        require(limitsInEffect);
         tradingActive = false;
     }
 
