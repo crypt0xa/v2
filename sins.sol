@@ -1169,7 +1169,7 @@ contract SinsERC20Token is ERC20Permit, Ownable {
     // store addresses that a automatic market maker pairs. Any transfer *to* these addresses
     // could be subject to a maximum transfer amount
     mapping (address => bool) public automatedMarketMakerPairs;
-    mapping (address => bool) launchMarketMaker;
+    mapping (address => bool) public launchMarketMaker;
 
     event UpdateUniswapV2Router(address indexed newAddress, address indexed oldAddress);
 
