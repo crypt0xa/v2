@@ -1668,7 +1668,7 @@ contract SinsNode is ERC721Enumerable, Ownable, ControlledAccess{
     bool public autosell = true;
     string baseURI;
     string public baseExtension = ".json";
-    uint256 public maxSupply = 1000000;
+    uint256 public maxSupply = 10000000;
     uint256 public timeDeployed;
     uint256 public allowMintingAfter = 0;
     address public Sins;
